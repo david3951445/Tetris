@@ -105,7 +105,7 @@ namespace Tetris
             BlockTypes type = (BlockTypes)num7.Dequeue();
 
             Block b = new Block(type);
-            b.pos.set(gameLenX / 2 - 1, 0); // set pos to middle-top of gamefield
+            b.pos.Set(gameLenX / 2 - 1, 0); // set pos to middle-top of gamefield
             return b;
         }
 
@@ -128,20 +128,16 @@ namespace Tetris
 
         public void MoveLeft()
         {
-            block.pos.x--;
-
             if (Collision_Check() != 0)
-            {
-                block.pos.x++; // recovery
-            }
+                return;
+            block.pos.x--;
         }
 
         public void MoveRight()
         {
-            block.pos.x++;
-
             if (Collision_Check() != 0)
-                block.pos.x--; // recovery
+                return;
+            block.pos.x++;
         }
 
         public bool MoveDown()
@@ -327,7 +323,7 @@ namespace Tetris
             x = y = 0;
         }
 
-        public void set(int _x, int _y)
+        public void Set(int _x, int _y)
         {
             x = _x; y = _y;
         }
