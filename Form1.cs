@@ -46,7 +46,7 @@ namespace Tetris
             AddLabelToTable(grids, tableLayoutPanel2);
 
             // HOLD and NEXT
-            TableLayoutPanel[] table = new TableLayoutPanel[] 
+            TableLayoutPanel[] table = new TableLayoutPanel[]
             {
                 tableLayoutPanel3,
                 tableLayoutPanel5,
@@ -82,9 +82,9 @@ namespace Tetris
         }
 
         private Block GenerateBlock() // Generate blocks with Tetris’s generation rules
-        { 
+        {
             if (num7.Count <= 7) // Since the rules are 7 different types a cycle, add a cycle if less then 7
-            { 
+            {
                 // Generate random no repeat numbers from 0 to 6. Draw Card Method
                 List<int> l = new List<int>() { 0, 1, 2, 3, 4, 5, 6 }; // cards
                 for (int i = 7; i > 0; i--)
@@ -105,7 +105,7 @@ namespace Tetris
             BlockTypes type = (BlockTypes)num7.Dequeue();
 
             Block b = new Block(type);
-            b.pos.Set(gameLenX / 2 - 1, 0); // set pos to middle-top of gamefield
+            b.Pos.Set(gameLenX / 2 - 1, 0); // set pos to middle-top of gamefield
             return b;
         }
 
@@ -128,35 +128,35 @@ namespace Tetris
 
         public void MoveLeft()
         {
-            if (Collision_Check() != 0)
-                return;
-            block.pos.x--;
+            block.Pos.X--;
+            if (CheckCollision() != 0)
+                block.Pos.X++;
         }
 
         public void MoveRight()
         {
-            if (Collision_Check() != 0)
-                return;
-            block.pos.x++;
+            block.Pos.X++;
+            if (CheckCollision() != 0)
+                block.Pos.X--;
         }
 
         public bool MoveDown()
         {
-            block.pos.y++;
+            block.Pos.Y++;
 
-            CollisionTypes check = Collision_Check();
+            CollisionTypes check = CheckCollision();
             if (check == CollisionTypes.Bottom || check == CollisionTypes.Gamefield)
             {
-                block.pos.y--; // recovery
+                block.Pos.Y--; // recovery
                 block.Print(grids); // recovery
 
                 timer1.Stop();
                 timer2.Start();
-                LineEliminated_check();
+                EliminateLine();
                 isHold = false;
 
                 block = GenerateBlock();
-                if (Collision_Check() != CollisionTypes.Free)
+                if (CheckCollision() != CollisionTypes.Free)
                 {
                     timer1.Stop();
                     MessageBox.Show("GAMEOVER");
@@ -173,7 +173,7 @@ namespace Tetris
         {
             block.Rotate();
 
-            if (Collision_Check() != CollisionTypes.Free)
+            if (CheckCollision() != CollisionTypes.Free)
                 block.RotateCounter(); // recovery
         }
 
@@ -181,29 +181,29 @@ namespace Tetris
         {
             block.RotateCounter();
 
-            if (Collision_Check() != CollisionTypes.Free)
+            if (CheckCollision() != CollisionTypes.Free)
                 block.Rotate(); // recovery
         }
 
-        private CollisionTypes Collision_Check()
+        private CollisionTypes CheckCollision()
         {
-            foreach (Coord c in block.shape)
+            foreach (Coord c in block.Shape)
             {
-                int x = block.pos.x + c.x;
-                int y = block.pos.y + c.y;
+                int x = block.Pos.X + c.X;
+                int y = block.Pos.Y + c.Y;
 
                 // boundary
-                if (x < 0) 
+                if (x < 0)
                     return CollisionTypes.Left;
-                if (x >= gameLenX) 
+                if (x >= gameLenX)
                     return CollisionTypes.Right;
-                if (y < 0) 
+                if (y < 0)
                     return CollisionTypes.Top;
-                if (y >= gameLenY) 
+                if (y >= gameLenY)
                     return CollisionTypes.Bottom;
 
                 // blocks on the field
-                if (grids[y, x].BackColor != Color.Black) 
+                if (grids[y, x].BackColor != Color.Black)
                     return CollisionTypes.Gamefield;
             }
 
@@ -217,10 +217,10 @@ namespace Tetris
             isHold = true;
 
             BlockTypes old = holdType;
-            holdType = block.type; // store type of current block       
+            holdType = block.Type; // store type of current block       
 
-            if (old == BlockTypes.NULL)
-            { // there is no hold block (first hold)
+            if (old == BlockTypes.NULL) // there is no hold block (first hold)
+            {
                 blockPics[(int)holdType].Print(picGrids[0]); // print current block on HOLD
                 block = GenerateBlock();
             }
@@ -229,47 +229,40 @@ namespace Tetris
                 blockPics[(int)old].Erase(picGrids[0]); // erase old block on HOLD
                 blockPics[(int)holdType].Print(picGrids[0]); // print current block on HOLD
                 block = new Block(old); // put hold block into gamefield
-                block.pos.x = gameLenX / 2 - 1;
+                block.Pos.X = gameLenX / 2 - 1;
             }
         }
 
-        private void LineEliminated_check()
+        private void EliminateLine()
         {
             // Check if exist line to be eliminated, if not, store it to oldLines[]
-            int[] oldLines = new int[gameLenY];
-            int k = gameLenY - 1;
-            for (int i = gameLenY - 1; i >= 0; i--)
+            var remainedLines = new List<int>();
+            for (int indexOfY = gameLenY - 1; indexOfY >= 0; indexOfY--)
             {
-                int j;
-                for (j = 0; j < gameLenX; j++)
-                {
-                    if (grids[i, j].BackColor == Color.Black)
-                    {
+                int indexOfX;
+                for (indexOfX = 0; indexOfX < gameLenX; indexOfX++)
+                    if (grids[indexOfY, indexOfX].BackColor == Color.Black)
                         break;
-                    }
-                }
 
-                if (j == gameLenX) // its a Line Clear
-                { 
+                if (indexOfX == gameLenX) // its a Line Clear
+                {
 
                 }
-                else
-                { // store lines that do not need to be eliminated
-                    oldLines[k--] = i;
-                    Console.WriteLine(k);
-                }
+                else // store lines that do not need to be eliminated
+                    remainedLines.Add(indexOfY);
             }
 
-            if (k > -1)
-                label3.Text = score.Update(block.type, k + 1);
+            if (remainedLines.Any())
+                label3.Text = score.Update(block.Type, gameLenY - remainedLines.Count);
 
-            for (int i = gameLenY - 1; i >= 0; i--)
+            for (int i = 0; i < gameLenY; i++)
                 for (int j = 0; j < gameLenX; j++)
                 {
-                    if (i >= k) // Still have old lines
-                        grids[i, j].BackColor = grids[oldLines[i], j].BackColor;
+                    var indexFromBottom = gameLenY - 1 - i;
+                    if (i < remainedLines.Count) // Still have old lines
+                        grids[indexFromBottom, j].BackColor = grids[remainedLines[i], j].BackColor;
                     else
-                        grids[i, j].BackColor = Color.Black; // Pad gamefield's color
+                        grids[indexFromBottom, j].BackColor = Color.Black; // Pad gamefield's color
                 }
         }
 
@@ -286,14 +279,14 @@ namespace Tetris
                 // Find squares at the bottom of block
                 int[] arr = new int[4];
                 for (int i = 0; i < 4; i++)
-                    arr[i] = block.shape[i].y;
+                    arr[i] = block.Shape[i].Y;
                 Array.Sort(arr);
 
                 // check those squares
                 for (int i = 3; i >= 0 && arr[i] == arr[3]; i--)
                 {
-                    int x = block.pos.x + block.shape[i].x;
-                    int y = block.pos.y + block.shape[i].y + 1;
+                    int x = block.Pos.X + block.Shape[i].X;
+                    int y = block.Pos.Y + block.Shape[i].Y + 1;
 
                     if (y >= gameLenY || grids[y, x].BackColor != Color.Black)
                         return;
@@ -312,32 +305,39 @@ namespace Tetris
 
     public enum CollisionTypes
     {
-        Free, Left, Right, Top, Bottom, BottomMinus, Gamefield
+        Free,
+        Left,
+        Right,
+        Top,
+        Bottom,
+        BottomMinus,
+        Gamefield
     }
 
     public class Coord
     {
-        public int x, y;
-        public Coord()
+        public int X;
+        public int Y;
+
+        public Coord() { }
+
+        public Coord(int x, int y)
         {
-            x = y = 0;
+            X = x;
+            Y = y;
         }
 
         public void Set(int _x, int _y)
         {
-            x = _x; y = _y;
+            X = _x; Y = _y;
         }
     };
 
 
     public class Score
     {
-        public int score = 0; // game score
-        public bool B2B = false; // B2B status
-
-        public Score()
-        {
-        }
+        private int _score = 0; // game score
+        private bool B2B = false; // B2B status
 
         public string Update(BlockTypes type, int line)
         {
@@ -345,22 +345,24 @@ namespace Tetris
             {
                 case BlockTypes.T:
                     // temporary method. Need to judge whether is T-spin.
-                    score += line * 2; // tetris bonus
-                    if (B2B) score++; // B2B bonus
+                    _score += line * 2; // tetris bonus
+                    if (B2B)
+                        _score++; // B2B bonus
                     B2B = true;
                     break;
                 case BlockTypes.I:
-                    score += line;
-                    if (B2B) score++; // B2B bonus
+                    _score += line;
+                    if (B2B)
+                        _score++; // B2B bonus
                     B2B = true;
                     break;
                 default:
-                    score += line;
+                    _score += line;
                     B2B = false; // B2B is interrupted
                     break;
             }
 
-            return "SCORE : " + score.ToString();
+            return "SCORE : " + _score.ToString();
         }
     };
 }
