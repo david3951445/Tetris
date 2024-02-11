@@ -49,3 +49,13 @@ D:\C sharp project\Tetris\Tetris\obj\Debug\Tetris.csproj.GenerateResource.cache
 D:\C sharp project\Tetris\Tetris\obj\Debug\Tetris.csproj.CoreCompileInputs.cache
 D:\C sharp project\Tetris\Tetris\obj\Debug\Tetris.exe
 D:\C sharp project\Tetris\Tetris\obj\Debug\Tetris.pdb
+D:\Projects\C sharp\Tetris\Tetris\bin\Debug\Tetris.exe.config
+D:\Projects\C sharp\Tetris\Tetris\bin\Debug\Tetris.exe
+D:\Projects\C sharp\Tetris\Tetris\bin\Debug\Tetris.pdb
+D:\Projects\C sharp\Tetris\Tetris\obj\Debug\Tetris.csproj.AssemblyReference.cache
+D:\Projects\C sharp\Tetris\Tetris\obj\Debug\Tetris.Form1.resources
+D:\Projects\C sharp\Tetris\Tetris\obj\Debug\Tetris.Properties.Resources.resources
+D:\Projects\C sharp\Tetris\Tetris\obj\Debug\Tetris.csproj.GenerateResource.cache
+D:\Projects\C sharp\Tetris\Tetris\obj\Debug\Tetris.csproj.CoreCompileInputs.cache
+D:\Projects\C sharp\Tetris\Tetris\obj\Debug\Tetris.exe
+D:\Projects\C sharp\Tetris\Tetris\obj\Debug\Tetris.pdb
